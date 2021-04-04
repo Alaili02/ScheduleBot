@@ -8,11 +8,12 @@ load_dotenv()
 TOKEN = getenv("TOKEN")
 OWNER_ID1 = getenv("OWNER_ID1")
 OWNER_ID2 = getenv("OWNER_ID2")
+OWNER_ID3= getenv("OWNER_ID3")
 
 bot = commands.Bot(
     command_prefix='*',
     case_insensitive=True,
-    owner_id=[int(OWNER_ID1), int(OWNER_ID2)],
+    owner_id=[int(OWNER_ID1), int(OWNER_ID2),int(OWNER_ID3)],
     activity=discord.Activity(name="your schedule", type=discord.ActivityType.watching),
 )
 bot.remove_command('help')
