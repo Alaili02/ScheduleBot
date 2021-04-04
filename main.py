@@ -6,12 +6,13 @@ from discord.ext import commands
 
 load_dotenv()
 TOKEN = getenv("TOKEN")
-OWNER_ID = getenv("OWNER_ID")
+OWNER_ID1 = getenv("OWNER_ID1")
+OWNER_ID2 = getenv("OWNER_ID2")
 
 bot = commands.Bot(
     command_prefix='*',
     case_insensitive=True,
-    owner_id=int(OWNER_ID),
+    owner_id=[int(OWNER_ID1), int(OWNER_ID2)],
     activity=discord.Activity(name="your schedule", type=discord.ActivityType.watching),
 )
 bot.remove_command('help')
