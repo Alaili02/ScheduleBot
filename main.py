@@ -30,7 +30,11 @@ async def on_ready():
 async def on_message(message):
     if message.author == bot.user:
         return
-    elif 'hello' in message.content.lower():
+
+    if message.author.id in bot.owner_id:
+        return await message.channel.send('MASTER')
+
+    if 'hello' in message.content.lower():
         return await message.channel.send('Hello')
 
 bot.run(TOKEN, bot=True)
