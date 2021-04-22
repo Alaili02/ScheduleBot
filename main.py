@@ -33,7 +33,7 @@ async def on_message(message):
         return
 
     if message.author.id in bot.owner_id:
-        return await message.channel.send('MASTER')
+        return await message.channel.send('why did u forgot me MASTER')
 
     if 'hello' in message.content.lower():
         return await message.channel.send('Hello')
