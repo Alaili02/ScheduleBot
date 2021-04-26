@@ -8,15 +8,16 @@ load_dotenv()
 TOKEN = getenv("TOKEN")
 OWNER_ID1 = getenv("OWNER_ID1")
 OWNER_ID2 = getenv("OWNER_ID2")
-OWNER_ID3= getenv("OWNER_ID3")
+OWNER_ID3 = getenv("OWNER_ID3")
+OWNER_ID4 = getenv("OWNER_ID4")
 
 bot = commands.Bot(
     command_prefix='*',
     case_insensitive=True,
-    owner_id=[int(OWNER_ID1), int(OWNER_ID2),int(OWNER_ID3)],
+    owner_id=[int(OWNER_ID1), int(OWNER_ID2), int(OWNER_ID3), int(OWNER_ID4)],
     activity=discord.Activity(name="your schedule", type=discord.ActivityType.watching),
 )
-bot.remove_command('help')
+
 
 @bot.event
 async def on_ready():
@@ -32,10 +33,7 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    if message.author.id in bot.owner_id:
-        return await message.channel.send('MASTER')
-
-    if 'hello' in message.content.lower():
+    if 'hi' in message.content.lower():
         return await message.channel.send('Hello')
 
 bot.run(TOKEN, bot=True)
