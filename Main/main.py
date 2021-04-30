@@ -33,7 +33,11 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    if 'hi' == message.content.lower():
+<<<<<<< HEAD
+    if message.content.lower() is 'hi':
+=======
+    if message.content.lower() is 'hi':
+>>>>>>> 223965c3790285f7fbe65d437b68cfc3a1965848
         return await message.channel.send('Hello')
 
 bot.run(TOKEN, bot=True)
