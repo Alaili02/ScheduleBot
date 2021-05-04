@@ -35,5 +35,9 @@ async def on_message(message):
 
     if message.content.lower() == 'hi':
         return await message.channel.send('Hello')
+    elif "rem" in message.content.lower():
+        print("hello console")
+        return await message.channel.send('baka shinaide kudasai')
+
 
 bot.run(TOKEN, bot=True)
