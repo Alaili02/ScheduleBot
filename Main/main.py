@@ -12,7 +12,7 @@ OWNER_ID3 = getenv("OWNER_ID3")
 OWNER_ID4 = getenv("OWNER_ID4")
 
 bot = commands.Bot(
-    command_prefix='*',
+    command_prefix=['rem ', 'Rem '],
     case_insensitive=True,
     owner_id=[int(OWNER_ID1), int(OWNER_ID2), int(OWNER_ID3), int(OWNER_ID4)],
     activity=discord.Activity(name="your schedule", type=discord.ActivityType.watching),
@@ -34,11 +34,6 @@ async def on_message(message):
 
     if message.content.lower() == 'hi':
         return await message.channel.send('Hello')
-    elif "rem" in message.content.lower():
-        print("hello console")
-        return await message.channel.send('baka shinaide kudasai')
-    elif "set date" in message.content.lower():
-        return await message.channel.send('ded')
 
 @bot.command(pass_context=True)
 async def load(ctx, extension):

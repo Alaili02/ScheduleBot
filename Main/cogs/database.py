@@ -11,8 +11,7 @@ class database(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         
-        try: 
-            
+        try:  
             self.myclient = pymongo.MongoClient(db, serverSelectionTimeoutMS = 2000)
             self.myclient.server_info()
             print(self.myclient.list_database_names())
@@ -31,16 +30,17 @@ class database(commands.Cog):
                 collist = self.mydb.list_collection_names()
                 if "myCollection" in collist:
                     print("The collection exists.")                    
-                    mydict = { "name": "Ram", "age": "17", "location": "imagination" }
+                    mydict = { "name": "Ram", "age": "19", "location": "imagination" }
                     x = self.mycol.insert_one(mydict)
 
     
     @commands.command(pass_context=True)
     async def GetElement(self, ctx):
         if ctx.message.author.id in self.bot.owner_id:
-            mydoc = self.mycol.find_one({"name": "Ram"})
-            return await ctx.send(mydoc['age'])
+            mydoc = self.mycol.find_one()
+            return await ctx.send(mydoc)
     @commands.command(pass_context=True)
+
     async def SetDate(self, ctx,*,arg):
         try:
             date_time_obj = datetime.strptime(arg, '%d/%m/%y %H:%M')
@@ -48,7 +48,7 @@ class database(commands.Cog):
             x = self.mycol.insert_one(mydict)
             return await ctx.send("date set "+arg)
         except:
-            return await ctx.send("incorrect format please enter d/m/y h/m")
+            return await ctx.send("incorrect format please enter dd/mm/yy hh/mm")
         
 
 
