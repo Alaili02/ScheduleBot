@@ -35,7 +35,7 @@ class database(commands.Cog):
 
     
     @commands.command(pass_context=True)
-    async def GetRam(self, ctx):
+    async def GetElement(self, ctx):
         if ctx.message.author.id in self.bot.owner_id:
             mydoc = self.mycol.find_one({"name": "Ram"})
             return await ctx.send(mydoc['age'])
