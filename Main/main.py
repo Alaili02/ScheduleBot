@@ -38,6 +38,8 @@ async def on_message(message):
     elif "rem" in message.content.lower():
         print("hello console")
         return await message.channel.send('baka shinaide kudasai')
+    elif "set date" in message.content.lower():
+        return await message.channel.send('ded')
 
 
 bot.run(TOKEN, bot=True)
