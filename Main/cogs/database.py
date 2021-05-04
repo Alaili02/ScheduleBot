@@ -3,6 +3,7 @@ from discord.ext import commands
 import pymongo
 from dotenv import load_dotenv
 from os import getenv
+from datetime import datetime
 load_dotenv()
 db= getenv("MONGODB_URI")
 
@@ -41,7 +42,13 @@ class database(commands.Cog):
             return await ctx.send(mydoc['age'])
     @commands.command(pass_context=True)
     async def SetDate(self, ctx,*,arg):
-        return await ctx.send(arg)
+        try:
+            date_time_obj = datetime.strptime(arg, '%d/%m/%y %H:%M')
+            mydict = { "name": ctx.message.author.name, "date":date_time_obj }
+            x = self.mycol.insert_one(mydict)
+            return await ctx.send("date set "+arg)
+        except:
+            return await ctx.send("incorrect format please enter d/m/y h/m")
         
 
 
