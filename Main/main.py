@@ -1,5 +1,5 @@
 import discord
-from os import getenv
+from os import getenv, listdir
 from dotenv import load_dotenv
 
 from discord.ext import commands
@@ -17,7 +17,6 @@ bot = commands.Bot(
     owner_id=[int(OWNER_ID1), int(OWNER_ID2), int(OWNER_ID3), int(OWNER_ID4)],
     activity=discord.Activity(name="your schedule", type=discord.ActivityType.watching),
 )
-
 
 @bot.event
 async def on_ready():
@@ -41,5 +40,28 @@ async def on_message(message):
     elif "set date" in message.content.lower():
         return await message.channel.send('ded')
 
+@bot.command(pass_context=True)
+async def load(ctx, extension):
+    if ctx.message.author.id in bot.owner_id:
+        bot.load_extension(f'cogs.{extension}')
+        await ctx.send("Loaded "+extension+" cog")
+
+@bot.command(pass_context=True)
+async def unload(ctx, extension):
+    if ctx.message.author.id in bot.owner_id:
+        bot.unload_extension(f'cogs.{extension}')
+        await ctx.send("Unloaded "+extension+" cog")
+
+@bot.command(pass_context=True)
+async def reload(ctx, extension):
+    if ctx.message.author.id in bot.owner_id:
+        bot.unload_extension(f'cogs.{extension}')
+        bot.load_extension(f'cogs.{extension}')
+        await ctx.send("Reloaded "+extension+" cog")
+
+
+for filename in listdir('./main/cogs'):
+    if filename.endswith('.py'):
+        bot.load_extension(f'cogs.{filename[:-3]}')
 
 bot.run(TOKEN, bot=True)
