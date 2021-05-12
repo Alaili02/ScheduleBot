@@ -37,6 +37,8 @@ async def on_message(message):
 
     if message.content.lower() == 'hi':
         return await message.channel.send('Hello')
+    if message.content.lower() == 'bye':
+        return await message.channel.send('See ya')
 
 @slash.slash(name="load",
             description="Loads a cog", 
@@ -72,7 +74,8 @@ async def reload(ctx, extension):
         bot.reload_extension(f'cogs.{extension}')
         await ctx.send("Reloaded "+extension+" cog")
 
-print(getcwd())
+
+
 for filename in listdir('./Main/cogs'):
     if filename.endswith('.py'):
         bot.load_extension(f'cogs.{filename[:-3]}')
