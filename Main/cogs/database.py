@@ -10,24 +10,27 @@ import pymongo
 from dotenv import load_dotenv
 from os import getenv
 from datetime import datetime
+import time
+import sched
 
 load_dotenv()
-db= getenv("MONGODB_URI")
+db = getenv("MONGODB_URI")
 guild_ids = [777264818733842442, 828216650473799691, 752331506248056926]
+s = sched.scheduler(time.time, time.sleep)
+
 
 class database(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        
-        try:  
-            self.myclient = pymongo.MongoClient(db, serverSelectionTimeoutMS = 2000)
+
+        try:
+            self.myclient = pymongo.MongoClient(db, serverSelectionTimeoutMS=2000)
             self.myclient.server_info()
             print(self.myclient.list_database_names())
             self.mydb = self.myclient["myDb"]
             self.mycol = self.mydb["myCollection"]
         except:
             print('Connection To Server Error')
-
 
     # @commands.command()
     # async def Connect(self, ctx):
@@ -41,7 +44,6 @@ class database(commands.Cog):
     #                 mydict = { "name": "Ram", "age": "19", "location": "imagination" }
     #                 x = self.mycol.insert_one(mydict)
 
-    
     # @commands.command(pass_context=True)
     # async def GetElement(self, ctx):
     #     if ctx.message.author.id in self.bot.owner_id:
@@ -57,59 +59,58 @@ class database(commands.Cog):
     #         return await ctx.send("date set "+arg)
     #     except:
     #         return await ctx.send("incorrect format please enter dd/mm/yy hh/mm")
-        
 
     @cog_ext.cog_slash(name="SetReminder",
-                    description="testing basic cog slash command", 
-                    guild_ids=guild_ids,
-                    options=[
-                        create_option(
-                            name="date",
-                            description="the day",
-                            option_type=SlashCommandOptionType.STRING,
-                            required=True,
-                        ),
-                        create_option(
-                            name="time",
-                            description="the time",
-                            option_type=SlashCommandOptionType.STRING,
-                            required=True,
-                        ),
-                        create_option(
-                            name="timezone",
-                            description="the timezone",
-                            option_type=SlashCommandOptionType.STRING,
-                            required=True,
-                            choices=[
-                                create_choice(
-                                    name="Lebanon/Beirut",
-                                    value="Asia/Beirut"
-                                ),
-                                create_choice(
-                                    name="Alaili",
-                                    value="America/New_York"
-                                ),
-                            ]
-                        ),
-                        create_option(
-                            name="name",
-                            description="the name",
-                            option_type=SlashCommandOptionType.STRING,
-                            required=True,
-                        ),
-                        create_option(
-                            name="reminder_description",
-                            description="the ReminderDescription",
-                            option_type=SlashCommandOptionType.STRING,
-                            required=False,
-                        ),
-                        create_option(
-                            name="type_of_reminder",
-                            description="the type_of_reminder",
-                            option_type=SlashCommandOptionType.STRING,
-                            required=False,
-                        )
-                    ])
+                       description="testing basic cog slash command",
+                       guild_ids=guild_ids,
+                       options=[
+                           create_option(
+                               name="date",
+                               description="the day",
+                               option_type=SlashCommandOptionType.STRING,
+                               required=True,
+                           ),
+                           create_option(
+                               name="time",
+                               description="the time",
+                               option_type=SlashCommandOptionType.STRING,
+                               required=True,
+                           ),
+                           create_option(
+                               name="timezone",
+                               description="the timezone",
+                               option_type=SlashCommandOptionType.STRING,
+                               required=True,
+                               choices=[
+                                   create_choice(
+                                       name="Lebanon/Beirut",
+                                       value="Asia/Beirut"
+                                   ),
+                                   create_choice(
+                                       name="Alaili",
+                                       value="America/New_York"
+                                   ),
+                               ]
+                           ),
+                           create_option(
+                               name="name",
+                               description="the name",
+                               option_type=SlashCommandOptionType.STRING,
+                               required=True,
+                           ),
+                           create_option(
+                               name="reminder_description",
+                               description="the ReminderDescription",
+                               option_type=SlashCommandOptionType.STRING,
+                               required=False,
+                           ),
+                           create_option(
+                               name="type_of_reminder",
+                               description="the type_of_reminder",
+                               option_type=SlashCommandOptionType.STRING,
+                               required=False,
+                           )
+                       ])
     async def SetReminder(self, ctx, date, time, timezone, name, reminder_description='', type_of_reminder=''):
         try:
             date_time_obj = datetime.strptime(date + " " + time, '%d/%m/%y %H:%M')
@@ -137,15 +138,16 @@ class database(commands.Cog):
                 print("\nInserted 1 document into " + coll_name + " of mydb ")
                 print(json.dumps(doc, indent=4))
                 print("\n")
-                return await ctx.send(f'Timezone: {d_aware.tzinfo}\nDay: {d_aware.day}\nMonth: {d_aware.month}\nHour: {d_aware.hour}\nMinute: {d_aware.minute}')   
+                return await ctx.send(
+                    f'Timezone: {d_aware.tzinfo}\nDay: {d_aware.day}\nMonth: {d_aware.month}\nHour: {d_aware.hour}\nMinute: {d_aware.minute}')
             except Exception as e:
                 return await ctx.send(e.__str__())
         else:
-            return await ctx.send('This date already passed')   
-
+            return await ctx.send('This date already passed')
 
     @commands.command(pass_context=True)
-    async def SetReminder(self, ctx, date, time, timezone, name, reminder_description='', type_of_reminder=''):
+    async def SetReminder(self, ctx, date, time, timezone, name, reminder_description='',
+                          type_of_reminder=''):
         try:
             date_time_obj = datetime.strptime(date + " " + time, '%d/%m/%y %H:%M')
         except Exception as e:
@@ -156,8 +158,10 @@ class database(commands.Cog):
 
         utc_date_time = datetime.utcfromtimestamp(d_aware.timestamp())
         present = datetime.utcnow()
+        # channel = discord.utils.get(ctx.guild.channels, name=target_channel)
+        # channel_id = channel.id
 
-        if (present < utc_date_time):
+        if present < utc_date_time:
             coll_name = f'{utc_date_time.day}-{utc_date_time.month}-{utc_date_time.year}'
             doc = {
                 "guild_id": ctx.guild.id,
@@ -165,18 +169,44 @@ class database(commands.Cog):
                 "date_time": utc_date_time,
                 "timezone": timezone,
                 "reminder_description": reminder_description,
-                "type_of_reminder": type_of_reminder
+                "type_of_reminder": type_of_reminder,
+                # "target_channel": channel_id
             }
             try:
                 mycoll = self.mydb[coll_name].insert(doc)
                 print("\nInserted 1 document into " + coll_name + " of mydb ")
                 print(doc)
                 print("\n")
-                return await ctx.send(f'Timezone: {d_aware.tzinfo}\nDay: {d_aware.day}\nMonth: {d_aware.month}\nHour: {d_aware.hour}\nMinute: {d_aware.minute}')   
+                return await ctx.send(
+                    f'Timezone: {d_aware.tzinfo}\nDay: {d_aware.day}\nMonth: {d_aware.month}\nHour: {d_aware.hour}\nMinute: {d_aware.minute}')
             except Exception as e:
                 return await ctx.send(e.__str__())
         else:
             return await ctx.send('This date already passed')
+
+    @commands.command(pass_context=True)
+    async def closest_remainder(self, ctx):
+        present = datetime.utcnow()
+        coll_name = f'{present.day}-{present.month}-{present.year}'
+        date = []
+        for doc in self.mydb[coll_name].find():
+            list1 = [doc['date_time'], doc['name'], doc['guild_id']]
+            # date.append(y['date_time'])
+            date.append(list1)
+        date.sort()
+        print(date[0])
+        print(present)
+        remaining_date = date[0][0] - present
+        print(remaining_date)
+        print(remaining_date.total_seconds())
+        s.enter(remaining_date.total_seconds(), 1, await sendRem(self, date[0]))
+
+
+async def sendRem(self, remainder):
+    guild = self.bot.get_guild(remainder[2])
+    general = discord.utils.find(lambda x: x.name == 'general', guild.text_channels)
+    await general.send(f'@everyone your {remainder[1]} reminder is due now!')
+
 
 def setup(bot):
     bot.add_cog(database(bot))
