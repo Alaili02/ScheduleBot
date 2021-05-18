@@ -1,3 +1,4 @@
+import asyncio
 import json
 from time import timezone
 import pytz
@@ -16,7 +17,6 @@ import sched
 load_dotenv()
 db = getenv("MONGODB_URI")
 guild_ids = [777264818733842442, 828216650473799691, 752331506248056926]
-s = sched.scheduler(time.time, time.sleep)
 
 
 class database(commands.Cog):
@@ -123,7 +123,7 @@ class database(commands.Cog):
         utc_date_time = datetime.utcfromtimestamp(d_aware.timestamp())
         present = datetime.utcnow()
 
-        if (present < utc_date_time):
+        if present < utc_date_time:
             coll_name = f'{utc_date_time.day}-{utc_date_time.month}-{utc_date_time.year}'
             doc = {
                 "guild_id": ctx.guild_id,
@@ -158,9 +158,6 @@ class database(commands.Cog):
 
         utc_date_time = datetime.utcfromtimestamp(d_aware.timestamp())
         present = datetime.utcnow()
-        # channel = discord.utils.get(ctx.guild.channels, name=target_channel)
-        # channel_id = channel.id
-
         if present < utc_date_time:
             coll_name = f'{utc_date_time.day}-{utc_date_time.month}-{utc_date_time.year}'
             doc = {
@@ -170,7 +167,6 @@ class database(commands.Cog):
                 "timezone": timezone,
                 "reminder_description": reminder_description,
                 "type_of_reminder": type_of_reminder,
-                # "target_channel": channel_id
             }
             try:
                 mycoll = self.mydb[coll_name].insert(doc)
@@ -185,7 +181,13 @@ class database(commands.Cog):
             return await ctx.send('This date already passed')
 
     @commands.command(pass_context=True)
-    async def closest_remainder(self, ctx):
+    async def SendReminder(self, ctx):
+        loop = asyncio.get_event_loop()
+        # print hello ten years after this answer was written
+        loop.create_task(self.closest_reminder())
+        loop.run_forever()
+
+    async def closest_reminder(self):
         present = datetime.utcnow()
         coll_name = f'{present.day}-{present.month}-{present.year}'
         date = []
@@ -199,13 +201,14 @@ class database(commands.Cog):
         remaining_date = date[0][0] - present
         print(remaining_date)
         print(remaining_date.total_seconds())
-        s.enter(remaining_date.total_seconds(), 1, await sendRem(self, date[0]))
+        await asyncio.sleep(remaining_date.total_seconds())
+        return await sendRem(self, date[0])
 
 
-async def sendRem(self, remainder):
-    guild = self.bot.get_guild(remainder[2])
+async def sendRem(self, reminder):
+    guild = self.bot.get_guild(reminder[2])
     general = discord.utils.find(lambda x: x.name == 'general', guild.text_channels)
-    await general.send(f'@everyone your {remainder[1]} reminder is due now!')
+    return await general.send(f'@everyone your {reminder[1]} reminder is due now!')
 
 
 def setup(bot):
