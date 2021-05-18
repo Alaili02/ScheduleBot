@@ -12,7 +12,6 @@ from dotenv import load_dotenv
 from os import getenv
 from datetime import datetime
 import time
-import sched
 
 load_dotenv()
 db = getenv("MONGODB_URI")
