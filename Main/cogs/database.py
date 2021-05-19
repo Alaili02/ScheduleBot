@@ -172,9 +172,9 @@ class database(commands.Cog):
                 print("\nInserted 1 document into " + coll_name + " of mydb ")
                 print(doc)
                 print("\n")
-                await self.closest_reminder()
-                return await ctx.send(
+                await ctx.send(
                     f'Timezone: {d_aware.tzinfo}\nDay: {d_aware.day}\nMonth: {d_aware.month}\nHour: {d_aware.hour}\nMinute: {d_aware.minute}')
+                return await self.closest_reminder()
             except Exception as e:
                 return await ctx.send(e.__str__())
         else:
@@ -197,10 +197,11 @@ class database(commands.Cog):
             print(remaining_date)
             print(remaining_date.total_seconds())
             await asyncio.sleep(remaining_date.total_seconds())
-            guild = self.bot.get_guild(date[2])
+            guild = self.bot.get_guild(date[0][2])
             general = discord.utils.find(lambda x: x.name == 'general', guild.text_channels)
-            await general.send(f'@everyone your {date[1]} reminder is due now!')
-            await self.SendReminder()
+            await general.send(f'hi your {date[0][1]} reminder is due now!')
+            self.mydb[coll_name].delete_one({'_id': date[0][3]})
+            await self.closest_reminder()
         else:
             print('no reminder left')
 
