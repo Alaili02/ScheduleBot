@@ -172,7 +172,7 @@ class database(commands.Cog):
                 print("\nInserted 1 document into " + coll_name + " of mydb ")
                 print(doc)
                 print("\n")
-                await self.SendReminder()
+                await self.closest_reminder()
                 return await ctx.send(
                     f'Timezone: {d_aware.tzinfo}\nDay: {d_aware.day}\nMonth: {d_aware.month}\nHour: {d_aware.hour}\nMinute: {d_aware.minute}')
             except Exception as e:
@@ -180,36 +180,32 @@ class database(commands.Cog):
         else:
             return await ctx.send('This date already passed')
 
-    async def SendReminder(self):
-        loop = asyncio.get_event_loop()
-        # print hello ten years after this answer was written
-        loop.create_task(self.closest_reminder())
 
     async def closest_reminder(self):
         present = datetime.utcnow()
         coll_name = f'{present.day}-{present.month}-{present.year}'
         date = []
-        for doc in self.mydb[coll_name].find():
-            list1 = [doc['date_time'], doc['name'], doc['guild_id'], doc['_id']]
-            # date.append(y['date_time'])
-            date.append(list1)
-        date.sort()
-        print(date[0])
-        print(present)
-        remaining_date = date[0][0] - present
-        print(remaining_date)
-        print(remaining_date.total_seconds())
-        await asyncio.sleep(remaining_date.total_seconds())
-        return await sendRem(self, date[0])
+        if self.mydb[coll_name].find().count()>0:
+            for doc in self.mydb[coll_name].find():
+                list1 = [doc['date_time'], doc['name'], doc['guild_id'], doc['_id']]
+                # date.append(y['date_time'])
+                date.append(list1)
+            date.sort()
+            print(date[0])
+            print(present)
+            remaining_date = date[0][0] - present
+            print(remaining_date)
+            print(remaining_date.total_seconds())
+            await asyncio.sleep(remaining_date.total_seconds())
+            guild = self.bot.get_guild(date[2])
+            general = discord.utils.find(lambda x: x.name == 'general', guild.text_channels)
+            await general.send(f'@everyone your {date[1]} reminder is due now!')
+            await self.SendReminder()
+        else:
+            print('no reminder left')
 
 
-async def sendRem(self, reminder):
-    guild = self.bot.get_guild(reminder[2])
-    general = discord.utils.find(lambda x: x.name == 'general', guild.text_channels)
-    coll_name = f'{reminder[0].day}-{reminder[0].month}-{reminder[0].year}'
-    self.mydb[coll_name].delete_one({'_id': reminder[3]})
-    await general.send(f'@everyone your {reminder[1]} reminder is due now!')
-    await self.SendReminder()
+
 
 
 def setup(bot):
