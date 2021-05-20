@@ -1,6 +1,6 @@
 discord.py==1.6.0
 python-dotenv==0.16.0
 pymongo[snappy,gssapi,srv,tls]
-discord-py-slash-command
+discord-py-slash-command==1.1.2
 pytz
 asyncio
