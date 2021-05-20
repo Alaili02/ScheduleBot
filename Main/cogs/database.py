@@ -25,7 +25,7 @@ guild_ids = [777264818733842442, 828216650473799691, 752331506248056926]
 class database(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.closest_rem: dict = None
+        self.closest_rem: dict = {}
 
         try:
             self.myclient = pymongo.MongoClient(db, serverSelectionTimeoutMS=2000)
@@ -83,8 +83,8 @@ class database(commands.Cog):
     async def SendRem(self):
         while True:
             present = datetime.utcnow()
-            if self.closest_rem is not None:
-                if int(present.timestamp() / 60) == int(self.closest_rem["date_time"].timestamp() / 60):
+            if self.closest_rem != {}:
+                if int(present.timestamp() / 60) >= int(self.closest_rem["date_time"].timestamp() / 60):
                     guild = self.bot.get_guild(self.closest_rem["guild_id"])
                     general = discord.utils.find(lambda x: x.name == self.closest_rem['channel'], guild.text_channels)
                     await general.send(f'hi your {self.closest_rem["name"]} reminder is due now!')
@@ -98,17 +98,21 @@ class database(commands.Cog):
                             traceback.print_exc()
                     self.Refresh_Closest_Reminder()
                 else:
-                    print('waiting')
+                    print('waiting - reminders due')
                     await asyncio.sleep(30)
             else:
-                print('waiting')
+                print('waiting - no reminders due')
                 await asyncio.sleep(30)
 
     @commands.command(pass_context=True)
     async def fetch(self, ctx):
-        self.Purge_Expired()
-        self.Refresh_Closest_Reminder()
-        return await ctx.send(f'Name: {self.closest_rem["name"]}. DateTime: {self.closest_rem["date_time"]}')
+        # self.Purge_Expired()
+        # self.Refresh_Closest_Reminder()
+        if self.closest_rem != {}:
+            return await ctx.send(f'Name: {self.closest_rem["name"]}. DateTime: {self.closest_rem["date_time"]}')
+        else:
+            return await ctx.send(f'No reminders due')
+
 
     def Get_Collection_Name(self, datetime: datetime):
         day = f'{datetime.day}'.zfill(2)
@@ -120,8 +124,8 @@ class database(commands.Cog):
     def Refresh_Closest_Reminder(self):
         print("Getting Earliest Collection: ")
         collections = self.mydb.list_collection_names()
-        if collections is not None:
-            self.closest_rem = None
+        if not collections:
+            self.closest_rem = {}
             return
         earliest_date_obj = datetime.strptime(collections[0], '%d-%m-%Y')
 
@@ -140,9 +144,7 @@ class database(commands.Cog):
                 self.closest_rem = documents[0]
                 print(f'\tEarliest Reminder: {documents[0]}')
             else:
-                self.closest_rem = None
-
-
+                self.closest_rem = {}
         except Exception:
             traceback.print_exc()
 
