@@ -43,7 +43,7 @@ class database(commands.Cog):
     async def ViewReminder(self, ctx, date, time, timezone, name,):
         mycol = mydb["ID"]
         for x in mycol.find():
-            print(x);
+            print("Hello");
     @commands.command(pass_context=True)
     async def SetReminder(self, ctx, date, time, timezone, name, reminder_description='', type_of_reminder=''):
         try:
