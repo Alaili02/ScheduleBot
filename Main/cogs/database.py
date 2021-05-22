@@ -40,7 +40,7 @@ class database(commands.Cog):
             traceback.print_exc()
         self.bot.loop.create_task(self.SendRem())
     @commands.command(pass_context=True)
-    async def ViewReminder(self, ctx, date, time, timezone, name,):
+    async def ViewReminder(self):
         mycol = mydb["ID"]
         print("Hello")
     @commands.command(pass_context=True)
