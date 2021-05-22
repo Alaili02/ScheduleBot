@@ -40,8 +40,10 @@ class database(commands.Cog):
             traceback.print_exc()
         self.bot.loop.create_task(self.SendRem())
     @commands.command(pass_context=True)
-    async def ViewReminder(self):
-        print("Hello")
+    async def ViewReminder(self,ctx):
+        mycol = self.mydb["23-05-2022"]
+        for x in mycol.find():
+            return await ctx.send(x['date_time'])
     @commands.command(pass_context=True)
     async def SetReminder(self, ctx, date, time, timezone, name, reminder_description='', type_of_reminder=''):
         try:
