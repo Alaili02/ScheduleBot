@@ -39,11 +39,13 @@ class database(commands.Cog):
         except Exception:
             traceback.print_exc()
         self.bot.loop.create_task(self.SendRem())
+    
     @commands.command(pass_context=True)
     async def ViewReminder(self,ctx):
         mycol = self.mydb["23-05-2022"]
         for x in mycol.find():
             return await ctx.send(x['date_time'])
+        
     @commands.command(pass_context=True)
     async def SetReminder(self, ctx, date, time, timezone, name, reminder_description='', type_of_reminder=''):
         try:
@@ -126,14 +128,14 @@ class database(commands.Cog):
         return f'{day}-{month}-{year}'
 
     def Refresh_Closest_Reminder(self):
-        print("Getting Earliest Collection: ")
+        print("Getting Earliest Reminder: ")
         collections = self.mydb.list_collection_names()
         if not collections:
             self.closest_rem = {}
             return
-        earliest_date_obj = datetime.strptime(collections[0], '%d-%m-%Y')
 
         # Get Earliest Collection
+        earliest_date_obj = datetime.strptime(collections[0], '%d-%m-%Y')
         for collection in collections:
             date_obj = datetime.strptime(collection, '%d-%m-%Y')
             if date_obj < earliest_date_obj:
@@ -174,11 +176,9 @@ class database(commands.Cog):
                     continue
 
                 # Valid Collections Continue The Loop Iteration
-                day, month, year = collection.split('-')
-                if int(year) >= int(present.year):
-                    if int(month) >= int(present.month):
-                        if int(day) >= int(present.day):
-                            continue
+                collection_date_obj = datetime.strptime(collections[0], '%d-%m-%Y')
+                if collection_date_obj >= present:
+                    continue
 
                 # Expired Collections Are Dropped
                 try:
