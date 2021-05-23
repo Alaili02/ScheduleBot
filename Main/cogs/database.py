@@ -42,8 +42,7 @@ class database(commands.Cog):
     
     @commands.command(pass_context=True)
     async def ViewReminder(self,ctx):
-        mycol = self.mydb["23-05-2022"]
-        for x in self.mydb.find():
+        for x in self.mydb.random.find():
             return await ctx.send(x['date_time'])
         
     @commands.command(pass_context=True)
