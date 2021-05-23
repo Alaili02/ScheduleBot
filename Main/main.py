@@ -1,11 +1,17 @@
 import discord
-from os import getenv, listdir, getcwd
+from os import getenv, listdir, getcwd, execl
 from dotenv import load_dotenv
 
 from discord.ext import commands
 from discord_slash import SlashCommand, SlashContext
 from discord_slash.utils.manage_commands import create_option, create_choice
 from discord_slash.model import SlashCommandOptionType
+
+import sys
+import asyncio
+import platform
+if platform.system() == 'Windows':
+	asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 load_dotenv()
 TOKEN = getenv("TOKEN")
@@ -125,6 +131,14 @@ async def reload(ctx, cog):
     if ctx.message.author.id in bot.owner_id:
         bot.reload_extension(f'cogs.{cog}')
         await ctx.send("Reloaded "+cog+" cog")
+
+@bot.command(pass_context=True)
+async def restart(ctx):
+    if ctx.message.author.id in bot.owner_id:
+        await ctx.send("Restarting...")
+        await bot.close()
+        python = sys.executable
+        execl(python, python, * sys.argv)
 
 print(getcwd())
 for filename in listdir('./Main/cogs'):

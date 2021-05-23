@@ -75,11 +75,12 @@ class database(commands.Cog):
         }
         try:
             self.mydb[coll].insert(doc)
-            self.Refresh_Closest_Reminder()
 
             print("\nInserted 1 document into " + coll + " of mydb ")
             print(doc)
             print("\n")
+
+            self.Refresh_Closest_Reminder()
 
             await ctx.send(
                 f'Timezone: {d_aware.tzinfo}\nDay: {d_aware.day}\nMonth: {d_aware.month}\nHour: {d_aware.hour}\nMinute: {d_aware.minute}\n')
@@ -104,10 +105,10 @@ class database(commands.Cog):
                             traceback.print_exc()
                     self.Refresh_Closest_Reminder()
                 else:
-                    print('waiting - reminders due')
+                    print('Waiting - Reminders due')
                     await asyncio.sleep(30)
             else:
-                print('waiting - no reminders due')
+                print('Waiting - No reminders due')
                 await asyncio.sleep(30)
 
     @commands.command(pass_context=True)
@@ -156,9 +157,17 @@ class database(commands.Cog):
 
     def Purge_Expired(self):
         print("Purging: ")
+
         present = datetime.utcnow()
         present_collection = self.Get_Collection_Name(present)
+        # Remove the hours, minutes, seconds from present date time
+        present_date_obj = datetime.strptime(present_collection, '%d-%m-%Y')
+
         collections = self.mydb.list_collection_names()
+
+        print(f'Present date: \t{present}')
+        print(f'Fixed present date: \t{present_date_obj}')
+
         for collection in collections:
             if bool(re.match("^[0-9]{2}-[0-9]{2}-[0-9]{4}$", collection)):
                 # Delete expired reminders in present collection
@@ -176,8 +185,11 @@ class database(commands.Cog):
                     continue
 
                 # Valid Collections Continue The Loop Iteration
-                collection_date_obj = datetime.strptime(collections[0], '%d-%m-%Y')
-                if collection_date_obj >= present:
+                collection_date_obj = datetime.strptime(collection, '%d-%m-%Y')
+                print(f'Collection Date: \t{collection_date_obj}')
+                print(f'\tValid: \t{collection_date_obj >= present}')
+                print(f'\tFixed Valid: \t{collection_date_obj >= present_date_obj}')
+                if collection_date_obj >= present_date_obj:
                     continue
 
                 # Expired Collections Are Dropped
