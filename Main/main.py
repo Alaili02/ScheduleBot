@@ -45,6 +45,8 @@ async def on_message(message):
         return await message.channel.send('Hello')
     if message.content.lower() == 'bye':
         return await message.channel.send('See ya')
+    if message.content.lower() == '':
+        return await message.channel.send('')
 
 
 @slash.slash(name="load",

@@ -39,7 +39,15 @@ class database(commands.Cog):
         except Exception:
             traceback.print_exc()
         self.bot.loop.create_task(self.SendRem())
-    
+
+
+    @commands.command(pass_context=True)
+    async def GetTimezones(self, ctx):
+        print("Hi, hadi ")
+
+
+
+
     @commands.command(pass_context=True)
     async def ViewReminder(self,ctx):
         mycol = self.mydb["23-05-2022"]
