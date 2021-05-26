@@ -43,8 +43,7 @@ class database(commands.Cog):
 
     @commands.command(pass_context=True)
     async def GetTimezones(self, ctx):
-        print("Hi, hadi ")
-
+        return await ctx.send("Hi, hadi ")
 
 
 
