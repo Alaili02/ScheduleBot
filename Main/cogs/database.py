@@ -40,9 +40,17 @@ class database(commands.Cog):
             traceback.print_exc()
         self.bot.loop.create_task(self.SendRem())
 
+
     @commands.command(pass_context=True)
+<<<<<<< HEAD
     async def GetTimezones(self,ctx):
         return await ctx.send(file=discord.File(r'../timezones.txt')
+=======
+    async def GetTimezones(self, ctx):
+        return await ctx.send("Hi, hadi ")
+
+
+>>>>>>> parent of c19a18b (hello)
 
     @commands.command(pass_context=True)
     async def ViewReminder(self,ctx):
