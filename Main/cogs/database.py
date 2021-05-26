@@ -43,13 +43,19 @@ class database(commands.Cog):
 
     @commands.command(pass_context=True)
 <<<<<<< HEAD
+<<<<<<< HEAD
     async def GetTimezones(self,ctx):
         return await ctx.send(file=discord.File(r'../timezones.txt')
 =======
+=======
+>>>>>>> parent of c19a18b (hello)
     async def GetTimezones(self, ctx):
         return await ctx.send("Hi, hadi ")
 
 
+<<<<<<< HEAD
+>>>>>>> parent of c19a18b (hello)
+=======
 >>>>>>> parent of c19a18b (hello)
 
     @commands.command(pass_context=True)
