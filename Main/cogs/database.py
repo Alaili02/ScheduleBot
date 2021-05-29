@@ -43,7 +43,7 @@ class database(commands.Cog):
 
     @commands.command(pass_context=True)
     async def GetTimezones(self,ctx):
-        return await ctx.send(file=discord.File(file,"timezones.txt"))
+        return await ctx.send(file=discord.File("timezones.txt"))
 
 
     @commands.command(pass_context=True)
