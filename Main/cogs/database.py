@@ -43,7 +43,7 @@ class database(commands.Cog):
 
     @commands.command(pass_context=True)
     async def GetTimezones(self,ctx):
-        return await ctx.send(file=discord.File('https://baudom-my.sharepoint.com/personal/hbs077_student_bau_edu_lb/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fhbs077%5Fstudent%5Fbau%5Fedu%5Flb%2FDocuments%2Ftimezones%2Etxt&parent=%2Fpersonal%2Fhbs077%5Fstudent%5Fbau%5Fedu%5Flb%2FDocuments'))
+        return await ctx.send(file=discord.File(https://baudom-my.sharepoint.com/personal/hbs077_student_bau_edu_lb/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fhbs077%5Fstudent%5Fbau%5Fedu%5Flb%2FDocuments%2Ftimezones%2Etxt&parent=%2Fpersonal%2Fhbs077%5Fstudent%5Fbau%5Fedu%5Flb%2FDocuments))
 
 
     @commands.command(pass_context=True)
