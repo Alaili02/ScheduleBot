@@ -1,4 +1,5 @@
 import asyncio
+from os import getenv, listdir, getcwd, execl
 from time import timezone
 from dns.name import EmptyLabel
 import pytz
@@ -43,7 +44,8 @@ class database(commands.Cog):
 
     @commands.command(pass_context=True)
     async def GetTimezones(self,ctx):
-        return await ctx.send(file=discord.File('/main/timezones.txt'))
+        print(getcwd())
+        return await ctx.send(file=discord.File(r'.\Main\timezones.txt'))
 
 
     @commands.command(pass_context=True)
