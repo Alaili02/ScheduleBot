@@ -1,13 +1,10 @@
 import asyncio
 from os import getenv, listdir, getcwd, execl
 from time import timezone
-from dns.name import EmptyLabel
+from pymongo.common import MAX_SUPPORTED_WIRE_VERSION
 import pytz
 import discord
 from discord.ext import commands
-from discord_slash import cog_ext, SlashContext
-from discord_slash.utils.manage_commands import create_option, create_choice
-from discord_slash.model import SlashCommandOptionType
 import pymongo
 from dotenv import load_dotenv
 from os import getenv
@@ -16,7 +13,9 @@ from datetime import datetime
 import re  # regex
 import traceback  # for detailed exceptions
 
-import time
+from bson.objectid import ObjectId
+
+import time 
 
 load_dotenv()
 db = getenv("MONGODB_URI")
@@ -45,14 +44,92 @@ class database(commands.Cog):
     @commands.command(pass_context=True)
     async def GetTimezones(self,ctx):
         print(getcwd())
-        return await ctx.send(file=discord.File(r'.\timezones.txt'))
+        return await ctx.send(file=discord.File(r'.\Main\timezones.txt'))
 
 
     @commands.command(pass_context=True)
     async def ViewReminder(self,ctx):
-        mycol = self.mydb["23-05-2022"]
-        for x in mycol.find():
-            return await ctx.send(x['date_time'])
+        reminders = self.getReminders(ctx.guild.id)
+        if (len(reminders) == 0):
+            return await ctx.send("No reminders!")
+        await ctx.send("Reminders: ")
+        for reminder in reminders:
+            await ctx.send('\t' + reminder['message'])
+
+    @commands.command(pass_context=True)
+    async def DeleteReminder(self,ctx):
+        reminders = self.getReminders(ctx.guild.id)
+        if (len(reminders) == 0):
+            return await ctx.send("No reminders to delete!")
+        await ctx.send("Reply the index of the reminder that you wish to delete: ")
+        for reminder in reminders:
+            await ctx.send('\t' + reminder['message'])
+
+        def check(m):
+            if m.channel == ctx.channel:
+                if m.author == ctx.message.author:
+                    try:
+                        int(m.content)
+                        return True
+                    except ValueError:
+                        return False
+            return False
+
+        is_valid_index = False
+        while not is_valid_index:
+            try:
+                msg = await self.bot.wait_for('message', check=check, timeout=20.0)
+            except asyncio.exceptions.TimeoutError:
+                await ctx.send("Timed out!")
+                return
+
+            index = int(msg.content) - 1
+            if 0 <= index <= len(reminders):
+                is_valid_index = True
+            else:
+                await ctx.send("Please pick a valid message number")
+
+
+        collection = reminders[index]['collection']
+        _id = reminders[index]['_id']
+
+        try:
+            self.mydb[collection].delete_one({'_id': ObjectId(_id)})
+            self.Refresh_Closest_Reminder()
+            return await ctx.send("Deleted " + reminders[index]['name'] + " reminder.")
+        except Exception:
+            return await ctx.send("Failed")
+
+    def getReminders(self, guild_id):
+        collections = self.mydb.list_collection_names()
+        count = 1
+        reminders_returned = []
+
+        for collection in collections:
+            if bool(re.match("^[0-9]{2}-[0-9]{2}-[0-9]{4}$", collection)):
+                documents = self.mydb[collection].find()
+                for x in documents:
+                    if  x['guild_id'] == guild_id:
+
+                        pytz_timezone = pytz.timezone(x['timezone'])
+                        date_time_obj = x['date_time']
+
+                        d_aware = pytz.utc.localize(date_time_obj)
+                        d_converted = d_aware.astimezone(pytz_timezone)
+
+                        if x["reminder_description"]:
+                            message = f'{count} - {d_converted} - {x["timezone"]} - {x["name"]} - {x["reminder_description"]}'
+                        else:
+                            message = f'{count} - {d_converted} - {x["timezone"]} - {x["name"]}'
+
+                        reminders_returned.append({ 
+                            'collection': collection, 
+                            '_id': x['_id'],
+                            'message': message,
+                            'name': x["name"]
+                        })   
+                        count += 1
+        return reminders_returned
         
     @commands.command(pass_context=True)
     async def SetReminder(self, ctx, date, time, timezone, name, reminder_description='', type_of_reminder=''):
@@ -173,8 +250,7 @@ class database(commands.Cog):
 
         collections = self.mydb.list_collection_names()
 
-        print(f'Present date: \t{present}')
-        print(f'Fixed present date: \t{present_date_obj}')
+        print(f'Present date: \t{present_date_obj}')
 
         for collection in collections:
             if bool(re.match("^[0-9]{2}-[0-9]{2}-[0-9]{4}$", collection)):
@@ -195,8 +271,7 @@ class database(commands.Cog):
                 # Valid Collections Continue The Loop Iteration
                 collection_date_obj = datetime.strptime(collection, '%d-%m-%Y')
                 print(f'Collection Date: \t{collection_date_obj}')
-                print(f'\tValid: \t{collection_date_obj >= present}')
-                print(f'\tFixed Valid: \t{collection_date_obj >= present_date_obj}')
+                print(f'\tValid: \t{collection_date_obj >= present_date_obj}')
                 if collection_date_obj >= present_date_obj:
                     continue
 

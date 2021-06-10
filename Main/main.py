@@ -1,12 +1,7 @@
 import discord
-from os import getenv, listdir, getcwd, execl
-from dotenv import load_dotenv
-
 from discord.ext import commands
-from discord_slash import SlashCommand, SlashContext
-from discord_slash.utils.manage_commands import create_option, create_choice
-from discord_slash.model import SlashCommandOptionType
-
+from dotenv import load_dotenv
+from os import getenv, listdir, getcwd, execl
 import sys
 import asyncio
 import platform
@@ -26,7 +21,6 @@ bot = commands.Bot(
     owner_id=[int(OWNER_ID1), int(OWNER_ID2), int(OWNER_ID3), int(OWNER_ID4)],
     activity=discord.Activity(name="your schedule", type=discord.ActivityType.watching),
 )
-slash = SlashCommand(bot, override_type = True, sync_commands=True, sync_on_cog_reload=True)
 guild_ids = [777264818733842442, 828216650473799691, 752331506248056926]
 
 @bot.event
@@ -47,74 +41,6 @@ async def on_message(message):
         return await message.channel.send('See ya')
     if message.content.lower() == '':
         return await message.channel.send('')
-
-
-@slash.slash(name="load",
-            description="Loads a cog", 
-            guild_ids=guild_ids,
-            options=[
-                create_option(
-                    name="cog",
-                    description="Specify which cog to load",
-                    option_type=SlashCommandOptionType.STRING,
-                    required=True,
-                    choices=[
-                        create_choice(
-                            name="Database",
-                            value="database"
-                        )
-                    ]
-                )
-            ])
-async def load(ctx, cog):
-    if ctx.author_id in bot.owner_id:
-        bot.load_extension(f'cogs.{cog}')
-        await ctx.send("Loaded "+cog+" cog")
-
-@slash.slash(name="unload",
-            description="Unloads a cog", 
-            guild_ids=guild_ids,
-            options=[
-                create_option(
-                    name="cog",
-                    description="Specify which cog to unload",
-                    option_type=SlashCommandOptionType.STRING,
-                    required=True,
-                    choices=[
-                        create_choice(
-                            name="Database",
-                            value="database"
-                        )
-                    ]
-                )
-            ])
-async def unload(ctx, cog):
-    if ctx.author_id in bot.owner_id:
-        bot.unload_extension(f'cogs.{cog}')
-        await ctx.send("Unloaded "+cog+" cog")
-
-@slash.slash(name="reload",
-            description="Reloads a cog", 
-            guild_ids=guild_ids,
-            options=[
-                create_option(
-                    name="cog",
-                    description="Specify which cog to reload",
-                    option_type=SlashCommandOptionType.STRING,
-                    required=True,
-                    choices=[
-                        create_choice(
-                            name="Database",
-                            value="database"
-                        )
-                    ]
-                )
-            ])
-async def reload(ctx, cog):
-    if ctx.author_id in bot.owner_id:
-        bot.reload_extension(f'cogs.{cog}')
-        await ctx.send("Reloaded "+cog+" cog")
-
 
 @bot.command(pass_context=True)
 async def load(ctx, cog):
